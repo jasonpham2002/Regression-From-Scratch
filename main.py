@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-class Linear_Regression:
-    def __init__(self, learning_rate=0.01, n_iterations=1000):
+class LinearRegressionFS:
+    def __init__(self, learning_rate=0.001, n_iterations=3000):
         self.lr = learning_rate
         self.n_iters = n_iterations
         self.w = None
@@ -11,7 +11,7 @@ class Linear_Regression:
     def compute_cost(self, X, y):
         m = X.shape[0]
         y_hat = X @ self.w
-        j = 1 / (2 * m) * np.sum((y_hat - y) ** 2)
+        j = 1 / (2 * m) * np.sum((y_hat - y) ** 2) # compute cost function
         return j
 
     def compute_gradient(self, X, y ):
@@ -20,7 +20,7 @@ class Linear_Regression:
 
         error = y_hat - y
 
-        dj_dw = (1/m) * (X.T @ error)
+        dj_dw = (1/m) * (X.T @ error) #compute gradient
         return dj_dw
 
     def gradient_descent(self, compute_gradient, X, y, alpha, iters, compute_cost):
@@ -43,4 +43,54 @@ class Linear_Regression:
         self.gradient_descent(self.compute_gradient, X, y, self.lr, self.n_iters, self.compute_cost)
 
     def predict(self, X):
+        return X @ self.w
+
+class LogisticRegressionFS:
+    def __init__(self, learning_rate=0.001, n_iterations = 3000):
+        self.lr = learning_rate
+        self.n_iters = n_iterations
+        self.w = None
+        self.cost_history = []
+
+    def _sigmoid(self, z):
+        np.clip(z, -500, 500)
+        return 1/(np.exp(-z))
+
+    def compute_cost(self, X, y):
+        m = X.shape[0]
+
+        y_hat = self._sigmoid(X @ self.w) # compute prediction from weights, converted prediction to probability
+                                        # using sigmoid function
+
+        j = -1/m * np.sum(y * np.log10(y_hat) + (1-y)*np.log10(1 - y_hat)) #compute cost function
+        return j
+
+    def compute_gradient(self, X, y):
+        m = X.shape(0)
+        y_hat = self._sigmoid(X @ self.w)
+
+        dj_dw = 1/m * ( X.T @ (y_hat-y)) # compute gradient
+        return dj_dw
+
+    def gradient_descent(self, X, y):
+        for i in range(self.n_iters):
+
+            self.w = self.w - self.lr * self.compute_gradient(X,y)
+            self.cost_history.append(self.compute_cost(X,y))
+
+
+
+    def fit(self, X, y):
+        m = X.shape[0] #number of training examples
+        ones = np.ones((m,1))
+
+        X = np.c_[ones, X] # added intercept weight
+        n = X.shape[1] # number of weights
+
+        self.w = np.zeros((n,1))
+
+
+        self.gradient_descent(X,y)
+
+    def predict(self, X,y):
         return X @ self.w
