@@ -53,20 +53,20 @@ class LogisticRegressionFS:
         self.cost_history = []
 
     def _sigmoid(self, z):
-        np.clip(z, -500, 500)
-        return 1/(np.exp(-z))
+        z = np.clip(z, -500, 500)
+        return 1/ (1 + np.exp(-z))
 
     def compute_cost(self, X, y):
         m = X.shape[0]
 
         y_hat = self._sigmoid(X @ self.w) # compute prediction from weights, converted prediction to probability
                                         # using sigmoid function
-
-        j = -1/m * np.sum(y * np.log10(y_hat) + (1-y)*np.log10(1 - y_hat)) #compute cost function
+        y_hat = np.clip(y_hat,1e-15, 1 - (1e-15))
+        j = -1/m * np.sum(y * np.log(y_hat) + (1-y)*np.log(1 - y_hat)) #compute cost function
         return j
 
     def compute_gradient(self, X, y):
-        m = X.shape(0)
+        m = X.shape[0]
         y_hat = self._sigmoid(X @ self.w)
 
         dj_dw = 1/m * ( X.T @ (y_hat-y)) # compute gradient
@@ -92,5 +92,8 @@ class LogisticRegressionFS:
 
         self.gradient_descent(X,y)
 
-    def predict(self, X,y):
-        return X @ self.w
+    def predict(self, X,y, threshold = 0.5):
+        ypredict = X @ self.w
+        z = self._sigmoid(ypredict)
+        if z > 0.5: return 1
+        else: return 0
