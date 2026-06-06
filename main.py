@@ -52,6 +52,7 @@ class LogisticRegressionFS:
         self.w = None
         self.cost_history = []
 
+
     def _sigmoid(self, z):
         z = np.clip(z, -500, 500)
         return 1/ (1 + np.exp(-z))
@@ -92,8 +93,17 @@ class LogisticRegressionFS:
 
         self.gradient_descent(X,y)
 
-    def predict(self, X,y, threshold = 0.5):
+    def predict(self, X, threshold = 0.5):
+
+        m = X.shape[0]  # number of testing examples
+        ones = np.ones((m, 1))
+
+        X = np.c_[ones, X]  # added intercept weight
+        n = X.shape[1]  # number of weights
+
         ypredict = X @ self.w
         z = self._sigmoid(ypredict)
-        if z > 0.5: return 1
-        else: return 0
+        return (z>=threshold).astype(int)
+
+    def accuracy_test(self, y_predict, y_true):
+        return np.mean(y_predict == y_true)
