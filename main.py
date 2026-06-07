@@ -32,18 +32,39 @@ class LinearRegressionFS:
 
     def fit(self, X,y):
         #add intercept column to X, compute the size of X through m and n
+
+       # X = X.to_numpy()
         m = X.shape[0]
         ones = np.ones((m,1))
         X = np.c_[ones, X]
         n = X.shape[1]
 
+        y = y.to_numpy().reshape(-1,1).astype(np.float64)
+
         #initializae w
-        self.w = np.zeros((n,1))
+        self.w = np.zeros((n,1), dtype = np.float64)
+
+        # convert y from pandas dataframe to a numpy array
+
 
         self.gradient_descent(self.compute_gradient, X, y, self.lr, self.n_iters, self.compute_cost)
 
     def predict(self, X):
+      #  X = X.to_numpy()
+        m = X.shape[0]
+        ones = np.ones((m, 1))
+        X = np.c_[ones, X]
+
         return X @ self.w
+
+
+    def accuracy(self, y_pred, y_true):
+        # calculation R^2 (coefficient of determination)
+        y_true = y_true.to_numpy().reshape(-1,1)
+        y_mean = np.mean(y_true)
+        co_deter = (np.sum((y_true - y_pred)**2)) / (np.sum((y_true - y_mean)**2))
+
+        return 1 - co_deter
 
 class LogisticRegressionFS:
     def __init__(self, learning_rate=0.001, n_iterations = 3000):
