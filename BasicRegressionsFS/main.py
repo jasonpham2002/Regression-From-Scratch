@@ -44,9 +44,7 @@ class LinearRegressionFS:
         #initializae w
         self.w = np.zeros((n,1), dtype = np.float64)
 
-        # convert y from pandas dataframe to a numpy arra   y
-
-
+        # convert y from pandas dataframe to a numpy array
         self.gradient_descent(self.compute_gradient, X, y, self.lr, self.n_iters, self.compute_cost)
 
     def predict(self, X):
